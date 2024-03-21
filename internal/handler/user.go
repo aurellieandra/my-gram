@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/aurellieandra/my-gram/internal/model"
 	"github.com/aurellieandra/my-gram/internal/service"
 	"github.com/aurellieandra/my-gram/pkg"
 	"github.com/gin-gonic/gin"
@@ -13,9 +14,8 @@ import (
 type UserHandler interface {
 	GetUsers(ctx *gin.Context)
 	GetUserById(ctx *gin.Context)
-	// Register(ctx *gin.Context)
-	// Login(ctx *gin.Context)
-	// Logout(ctx *gin.Context)
+	Register(ctx *gin.Context)
+	Login(ctx *gin.Context)
 	UpdateUserById(ctx *gin.Context)
 	DeleteUserById(ctx *gin.Context)
 }
@@ -44,7 +44,7 @@ func (u *userHandlerImpl) GetUsers(ctx *gin.Context) {
 func (u *userHandlerImpl) GetUserById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if id == 0 || err != nil {
-		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "invalid required param"})
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "Invalid required param"})
 		return
 	}
 	user, err := u.svc.GetUserById(ctx, uint64(id))
@@ -54,39 +54,32 @@ func (u *userHandlerImpl) GetUserById(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
-// func (u *userHandlerImpl) Register(ctx *gin.Context) {
-// 	id, err := strconv.Atoi(ctx.PostForm(order))
-// 	if id == 0 || err != nil {
-// 		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "invalid required param"})
-// 		return
-// 	}
-// 	user, err := u.svc.Register(ctx, uint64(id))
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse{Message: err.Error()})
-// 		return
-// 	}
-// 	ctx.JSON(http.StatusOK, user)
-// }
-// func (u *userHandlerImpl) Logout(ctx *gin.Context) {
-// 	id, err := strconv.Atoi(ctx.Param("id"))
-// 	if id == 0 || err != nil {
-// 		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "invalid required param"})
-// 		return
-// 	}
-// 	err = u.svc.DeleteUserById(ctx, uint64(id))
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse{Message: err.Error()})
-// 		return
-// 	}
-// 	ctx.JSON(http.StatusOK, nil)
-// }
+func (u *userHandlerImpl) Register(ctx *gin.Context) {
+	var newUser model.User
+	if err := ctx.BindJSON(&newUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "Invalid user data provided"})
+		return
+	}
+	user, err := u.svc.Register(ctx, newUser)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse{Message: err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, user)
+}
 func (u *userHandlerImpl) UpdateUserById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if id == 0 || err != nil {
-		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "invalid required param"})
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "Invalid required param"})
 		return
 	}
-	user, err := u.svc.UpdateUserById(ctx, uint64(id))
+
+	var newUser model.User
+	if err := ctx.BindJSON(&newUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "Invalid user data provided"})
+		return
+	}
+	user, err := u.svc.UpdateUserById(ctx, newUser, uint64(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse{Message: err.Error()})
 		return
@@ -96,7 +89,7 @@ func (u *userHandlerImpl) UpdateUserById(ctx *gin.Context) {
 func (u *userHandlerImpl) DeleteUserById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if id == 0 || err != nil {
-		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "invalid required param"})
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse{Message: "Invalid required param"})
 		return
 	}
 	err = u.svc.DeleteUserById(ctx, uint64(id))

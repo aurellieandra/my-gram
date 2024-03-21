@@ -25,9 +25,9 @@ func NewGormPostgres() GormPostgres {
 }
 
 // CONNECT
-func connect() *gorm.DB{
+func connect() *gorm.DB {
 	host := "localhost"
-	port := "5432"
+	port := "5433"
 	user := "postgres"
 	password := "admin123"
 	dbname := "my-gram"
@@ -40,7 +40,7 @@ func connect() *gorm.DB{
 	return db
 }
 
-//  GORM POSTGRES IMPL
+// GORM POSTGRES IMPL
 func (g *gormPostgresImpl) GetConnection() *gorm.DB {
 	return g.master
 }

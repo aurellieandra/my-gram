@@ -11,22 +11,21 @@ import (
 type UserService interface {
 	GetUsers(ctx context.Context) ([]model.User, error)
 	GetUserById(ctx context.Context, id uint64) (model.User, error)
-	// Register(ctx context.Context, user model.User) (model.User, error)
-	// Login(ctx context.Context) (model.User, error)
-	// Logout(ctx context.Context) error
-	UpdateUserById(ctx context.Context, id uint64) (model.User, error)
+	Register(ctx context.Context, user model.User) (model.User, error)
+	Login(ctx context.Context, user model.User) (model.User, error)
+	UpdateUserById(ctx context.Context, user model.User, id uint64) (model.User, error)
 	DeleteUserById(ctx context.Context, id uint64) error
 }
 
 // STRUCT
 type userServiceImpl struct {
-	repo repository.UserQuery
+	repo    repository.UserQuery
 	command repository.UserCommand
 }
 
 // NEW USER SERVICE
 func NewUserService(repo repository.UserQuery, command repository.UserCommand) UserService {
-	return &userServiceImpl{repo:repo, command:command}
+	return &userServiceImpl{repo: repo, command: command}
 }
 
 // USER SERVICE IMPL
@@ -51,25 +50,21 @@ func (u *userServiceImpl) Register(ctx context.Context, user model.User) (model.
 	}
 	return registeredUser, nil
 }
-func (u *userServiceImpl) Login(ctx context.Context) (model.User, error) {
-    loggedInUser, err := u.command.Login(ctx)
-    if err != nil {
-        return model.User{}, err
-    }
-    return loggedInUser, nil
+func (u *userServiceImpl) Login(ctx context.Context, user model.User) (model.User, error) {
+	loggedInUser, err := u.command.Login(ctx, user)
+	if err != nil {
+		return model.User{}, err
+	}
+	return loggedInUser, nil
 }
-func (u *userServiceImpl) Logout(ctx context.Context) error {
-    err := u.command.Logout(ctx)
-    return err
-}
-func (u *userServiceImpl) UpdateUserById(ctx context.Context, id uint64) (model.User, error) {
-    updatedUser, err := u.command.UpdateUserById(ctx, id)
-    if err != nil {
-        return model.User{}, err
-    }
-    return updatedUser, nil
+func (u *userServiceImpl) UpdateUserById(ctx context.Context, user model.User, id uint64) (model.User, error) {
+	updatedUser, err := u.command.UpdateUserById(ctx, user, id)
+	if err != nil {
+		return model.User{}, err
+	}
+	return updatedUser, nil
 }
 func (u *userServiceImpl) DeleteUserById(ctx context.Context, id uint64) error {
-    err := u.command.DeleteUserById(ctx, id)
-    return err
+	err := u.command.DeleteUserById(ctx, id)
+	return err
 }
