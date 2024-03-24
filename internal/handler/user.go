@@ -14,6 +14,7 @@ import (
 type UserHandler interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	Logout(ctx *gin.Context)
 
 	GetUsers(ctx *gin.Context)
 	GetUserById(ctx *gin.Context)
@@ -133,6 +134,26 @@ func (u *userHandlerImpl) Login(ctx *gin.Context) {
 		Message: "Login successfully",
 		Data:    userResponse,
 		Token:   token,
+	})
+}
+
+func (u *userHandlerImpl) Logout(ctx *gin.Context) {
+	authHeader := ctx.GetHeader("Authorization")
+	if authHeader == "" {
+		ctx.JSON(http.StatusUnauthorized, pkg.Response{
+			Status:  http.StatusUnauthorized,
+			Message: "Authorization header is missing",
+			Data:    nil,
+		})
+		return
+	}
+
+	ctx.Header("Authorization", "")
+
+	ctx.JSON(http.StatusOK, pkg.Response{
+		Status:  http.StatusOK,
+		Message: "Logout successfully",
+		Data:    nil,
 	})
 }
 
