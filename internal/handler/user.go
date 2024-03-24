@@ -87,7 +87,7 @@ func (u *userHandlerImpl) Register(ctx *gin.Context) {
 
 func (u *userHandlerImpl) Login(ctx *gin.Context) {
 	var credentials model.User
-	if err := ctx.BindJSON(&credentials); err != nil {
+	if err := ctx.Bind(&credentials); err != nil {
 		ctx.JSON(http.StatusBadRequest, pkg.Response{
 			Status:  http.StatusBadRequest,
 			Message: "Bind credentials failure",
@@ -115,6 +115,8 @@ func (u *userHandlerImpl) Login(ctx *gin.Context) {
 		})
 		return
 	}
+
+	ctx.Header("Authorization", "Bearer "+token)
 
 	userResponse := model.UserResponse{
 		ID:        user.ID,

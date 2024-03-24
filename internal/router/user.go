@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/aurellieandra/my-gram/internal/handler"
+	"github.com/aurellieandra/my-gram/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,9 +27,9 @@ func (u *userRouterImpl) Mount() {
 	u.v.POST("/register", u.handler.Register)
 	u.v.POST("/login", u.handler.Login)
 
+	u.v.Use(middleware.CheckAuthBearer)
 	u.v.GET("/", u.handler.GetUsers)
 	u.v.GET("/:id", u.handler.GetUserById)
-
 	u.v.PUT("/:id", u.handler.UpdateUserById)
 	u.v.DELETE("/:id", u.handler.DeleteUserById)
 }

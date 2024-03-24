@@ -29,7 +29,7 @@ func main() {
 	photoHdl := handler.NewPhotoHandler(photoSvc)
 	photoRouter := router.NewPhotoRouter(photosGroup, photoHdl)
 
-	socialMediasGroup := v1.Group("/social-medias")
+	socialMediasGroup := v1.Group("/socialmedias")
 	socialMediaRepo := repository.NewSocialMediaQuery(gorm)
 	socialMediaCmd := repository.NewSocialMediaCommand(gorm)
 	socialMediaSvc := service.NewSocialMediaService(socialMediaRepo, socialMediaCmd)

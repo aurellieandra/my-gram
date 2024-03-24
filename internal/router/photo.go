@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/aurellieandra/my-gram/internal/handler"
+	"github.com/aurellieandra/my-gram/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,9 +24,9 @@ func NewPhotoRouter(v *gin.RouterGroup, handler handler.PhotoHandler) PhotoRoute
 
 // PHOTO ROUTER IMPL
 func (u *photoRouterImpl) Mount() {
+	u.v.Use(middleware.CheckAuthBearer)
 	u.v.GET("", u.handler.GetPhotos)
 	u.v.GET("/:id", u.handler.GetPhotoById)
-
 	u.v.POST("/", u.handler.CreatePhoto)
 	u.v.PUT("/:id", u.handler.UpdatePhotoById)
 	u.v.DELETE("/:id", u.handler.DeletePhotoById)

@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/aurellieandra/my-gram/internal/infrastructure"
 	"github.com/aurellieandra/my-gram/internal/model"
+	"github.com/aurellieandra/my-gram/pkg/helper"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -67,6 +67,12 @@ func (u *userQueryImpl) GetUserById(ctx context.Context, id uint64) (*model.User
 func (u *userCommandImpl) Register(ctx context.Context, user model.User) (model.User, error) {
 	db := u.db.GetConnection()
 
+	pass, err := helper.GenerateHash(user.Password)
+	if err != nil {
+		return model.User{}, err
+	}
+	user.Password = pass
+
 	if err := db.WithContext(ctx).Create(&user).Error; err != nil {
 		return model.User{}, err
 	}
@@ -82,12 +88,10 @@ func (u *userCommandImpl) Login(ctx context.Context, credentials model.User) (mo
 		return model.User{}, err
 	}
 
-	fmt.Println(existingUser.Password)
-	fmt.Println(credentials.Password)
-
 	if err := bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(credentials.Password)); err != nil {
 		return model.User{}, err
 	}
+
 	return existingUser, nil
 }
 

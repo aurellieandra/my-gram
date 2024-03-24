@@ -38,18 +38,6 @@ func NewUserService(repo repository.UserQuery, command repository.UserCommand) U
 
 // USER SERVICE IMPL
 func (u *userServiceImpl) Register(ctx context.Context, user model.User) (model.User, error) {
-	user = model.User{
-		Username: user.Username,
-		Email:    user.Email,
-		Dob:      user.Dob,
-	}
-
-	pass, err := helper.GenerateHash(user.Password)
-	if err != nil {
-		return model.User{}, err
-	}
-	user.Password = pass
-
 	registeredUser, err := u.command.Register(ctx, user)
 	if err != nil {
 		return model.User{}, err
@@ -59,16 +47,6 @@ func (u *userServiceImpl) Register(ctx context.Context, user model.User) (model.
 }
 
 func (u *userServiceImpl) Login(ctx context.Context, credentials model.User) (model.User, error) {
-	credentials = model.User{
-		Username: credentials.Username,
-	}
-
-	pass, err := helper.GenerateHash(credentials.Password)
-	if err != nil {
-		return model.User{}, err
-	}
-	credentials.Password = pass
-
 	loggedInUser, err := u.command.Login(ctx, credentials)
 	if err != nil {
 		return model.User{}, err

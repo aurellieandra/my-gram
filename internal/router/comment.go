@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/aurellieandra/my-gram/internal/handler"
+	"github.com/aurellieandra/my-gram/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,9 +24,9 @@ func NewCommentRouter(v *gin.RouterGroup, handler handler.CommentHandler) Commen
 
 // PHOTO ROUTER IMPL
 func (u *commentRouterImpl) Mount() {
+	u.v.Use(middleware.CheckAuthBearer)
 	u.v.GET("", u.handler.GetComments)
 	u.v.GET("/:id", u.handler.GetCommentById)
-
 	u.v.POST("/", u.handler.CreateComment)
 	u.v.PUT("/:id", u.handler.UpdateCommentById)
 	u.v.DELETE("/:id", u.handler.DeleteCommentById)
