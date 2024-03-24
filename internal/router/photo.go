@@ -23,8 +23,7 @@ func NewPhotoRouter(v *gin.RouterGroup, handler handler.PhotoHandler) PhotoRoute
 
 // PHOTO ROUTER IMPL
 func (u *photoRouterImpl) Mount() {
-	u.v.GET("/", u.handler.GetPhotos)
-	u.v.GET("/user/:user_id", u.handler.GetPhotosByUserId)
+	u.v.GET("", u.handler.GetPhotos)
 	u.v.GET("/:id", u.handler.GetPhotoById)
 
 	u.v.POST("/", u.handler.CreatePhoto)

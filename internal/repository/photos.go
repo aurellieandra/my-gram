@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aurellieandra/my-gram/internal/infrastructure"
@@ -10,8 +11,7 @@ import (
 
 // INTERFACE
 type PhotoQuery interface {
-	GetPhotos(ctx context.Context) ([]model.Photo, error)
-	GetPhotosByUserId(ctx context.Context, id uint64) ([]model.Photo, error)
+	GetPhotos(ctx context.Context, user_id *uint64) ([]model.Photo, error)
 	GetPhotoById(ctx context.Context, id uint64) (*model.Photo, error)
 }
 type PhotoCommand interface {
@@ -36,24 +36,22 @@ func NewPhotoCommand(db infrastructure.GormPostgres) PhotoCommand {
 	return &photoCommandImpl{db: db}
 }
 
-// USER PHOTO IMPL
-func (u *photoQueryImpl) GetPhotos(ctx context.Context) ([]model.Photo, error) {
+// PHOTO QUERY IMPL
+func (u *photoQueryImpl) GetPhotos(ctx context.Context, user_id *uint64) ([]model.Photo, error) {
 	db := u.db.GetConnection()
 	photos := []model.Photo{}
 
-	if err := db.WithContext(ctx).Table("photos").Where("deleted_at IS NULL").Find(&photos).Error; err != nil {
-		return nil, nil
-	}
-	return photos, nil
-}
+	query := db.WithContext(ctx).Table("photos").Where("deleted_at IS NULL")
+	fmt.Println(query)
 
-func (u *photoQueryImpl) GetPhotosByUserId(ctx context.Context, id uint64) ([]model.Photo, error) {
-	db := u.db.GetConnection()
-	photos := []model.Photo{}
-
-	if err := db.WithContext(ctx).Table("photos").Where("user_id = ?", id).Where("deleted_at IS NULL").Find(&photos).Error; err != nil {
-		return []model.Photo{}, nil
+	if user_id != nil && *user_id != 0 {
+		query = query.Where("user_id = ?", *user_id)
 	}
+
+	if err := query.Find(&photos).Error; err != nil {
+		return nil, err
+	}
+
 	return photos, nil
 }
 
@@ -68,7 +66,7 @@ func (u *photoQueryImpl) GetPhotoById(ctx context.Context, id uint64) (*model.Ph
 	return photo, nil
 }
 
-// USER COMMAND IMPL
+// PHOTO COMMAND IMPL
 func (u *photoCommandImpl) CreatePhoto(ctx context.Context, photo model.Photo) (model.Photo, error) {
 	db := u.db.GetConnection()
 

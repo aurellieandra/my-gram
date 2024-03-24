@@ -9,8 +9,7 @@ import (
 
 // INTERFACE
 type PhotoService interface {
-	GetPhotos(ctx context.Context) ([]model.Photo, error)
-	GetPhotosByUserId(ctx context.Context, id uint64) ([]model.Photo, error)
+	GetPhotos(ctx context.Context, user_id *uint64) ([]model.Photo, error)
 	GetPhotoById(ctx context.Context, id uint64) (*model.Photo, error)
 
 	CreatePhoto(ctx context.Context, photo model.Photo) (model.Photo, error)
@@ -30,16 +29,10 @@ func NewPhotoService(repo repository.PhotoQuery, command repository.PhotoCommand
 }
 
 // USER SERVICE IMPL
-func (u *photoServiceImpl) GetPhotos(ctx context.Context) ([]model.Photo, error) {
-	photos, err := u.repo.GetPhotos(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return photos, err
-}
+func (u *photoServiceImpl) GetPhotos(ctx context.Context, user_id *uint64) ([]model.Photo, error) {
+	id := *user_id
 
-func (u *photoServiceImpl) GetPhotosByUserId(ctx context.Context, id uint64) ([]model.Photo, error) {
-	photos, err := u.repo.GetPhotosByUserId(ctx, id)
+	photos, err := u.repo.GetPhotos(ctx, &id)
 	if err != nil {
 		return nil, err
 	}

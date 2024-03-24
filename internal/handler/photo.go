@@ -13,7 +13,6 @@ import (
 // INTERFACE
 type PhotoHandler interface {
 	GetPhotos(ctx *gin.Context)
-	GetPhotosByUserId(ctx *gin.Context)
 	GetPhotoById(ctx *gin.Context)
 
 	CreatePhoto(ctx *gin.Context)
@@ -35,39 +34,27 @@ func NewPhotoHandler(svc service.PhotoService) PhotoHandler {
 
 // PHOTO HANDLER IMPL
 func (u *photoHandlerImpl) GetPhotos(ctx *gin.Context) {
-	photos, err := u.svc.GetPhotos(ctx)
+	user_id_str := ctx.Query("user_id")
+	var user_id uint64
+
+	if user_id_str != "" {
+		id, err := strconv.ParseUint(user_id_str, 10, 64)
+		if id == 0 || err != nil {
+			ctx.JSON(http.StatusBadRequest, pkg.Response{
+				Status:  http.StatusBadRequest,
+				Message: "Fetching ID from query param failure",
+				Data:    nil,
+			})
+			return
+		}
+		user_id = id
+	}
+
+	photos, err := u.svc.GetPhotos(ctx, &user_id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, pkg.Response{
 			Status:  http.StatusBadRequest,
 			Message: "Get photos service failure",
-			Data:    nil,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, pkg.Response{
-		Status:  http.StatusOK,
-		Message: "Get photos data successfully",
-		Data:    photos,
-	})
-}
-
-func (u *photoHandlerImpl) GetPhotosByUserId(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if id == 0 || err != nil {
-		ctx.JSON(http.StatusBadRequest, pkg.Response{
-			Status:  http.StatusBadRequest,
-			Message: "Fetching ID from param failure",
-			Data:    nil,
-		})
-		return
-	}
-
-	photos, err := u.svc.GetPhotosByUserId(ctx, uint64(id))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, pkg.Response{
-			Status:  http.StatusBadRequest,
-			Message: "Get photos by photo id service failure",
 			Data:    nil,
 		})
 		return
@@ -117,7 +104,7 @@ func (u *photoHandlerImpl) GetPhotoById(ctx *gin.Context) {
 
 func (u *photoHandlerImpl) CreatePhoto(ctx *gin.Context) {
 	var newPhoto model.Photo
-	newPhoto.User_Id = 4
+	newPhoto.User_Id = 3
 
 	if err := ctx.Bind(&newPhoto); err != nil {
 		ctx.JSON(http.StatusBadRequest, pkg.Response{
