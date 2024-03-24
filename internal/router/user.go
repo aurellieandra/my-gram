@@ -23,10 +23,12 @@ func NewUserRouter(v *gin.RouterGroup, handler handler.UserHandler) UserRouter {
 
 // USER ROUTER IMPL
 func (u *userRouterImpl) Mount() {
+	u.v.POST("/register", u.handler.Register)
+	u.v.POST("/login", u.handler.Login)
+
 	u.v.GET("/", u.handler.GetUsers)
 	u.v.GET("/:id", u.handler.GetUserById)
-	u.v.POST("/register", u.handler.Register)
-	u.v.GET("/login", u.handler.Login)
+
 	u.v.PUT("/:id", u.handler.UpdateUserById)
 	u.v.DELETE("/:id", u.handler.DeleteUserById)
 }

@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"fmt"
 
+	"github.com/aurellieandra/my-gram/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -35,8 +36,10 @@ func connect() *gorm.DB {
 	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		panic("Connecting to database failed...")
 	}
+
+	db.AutoMigrate(&model.User{})
 	return db
 }
 
