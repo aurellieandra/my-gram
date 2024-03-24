@@ -47,7 +47,7 @@ func (u *userQueryImpl) GetUsers(ctx context.Context) ([]model.User, error) {
 	db := u.db.GetConnection()
 	users := []model.User{}
 
-	if err := db.WithContext(ctx).Table("users").Find(&users).Error; err != nil {
+	if err := db.WithContext(ctx).Table("users").Where("deleted_at IS NULL").Find(&users).Error; err != nil {
 		return nil, nil
 	}
 	return users, nil
@@ -55,13 +55,12 @@ func (u *userQueryImpl) GetUsers(ctx context.Context) ([]model.User, error) {
 
 func (u *userQueryImpl) GetUserById(ctx context.Context, id uint64) (*model.User, error) {
 	db := u.db.GetConnection()
-	var users *model.User
+	var user *model.User
 
-	if err := db.WithContext(ctx).Table("users").Where("id = ?", id).Find(&users).Error; err != nil {
+	if err := db.WithContext(ctx).Table("users").Where("id = ?", id).Where("deleted_at IS NULL").Find(&user).Error; err != nil {
 		return nil, nil
 	}
-
-	return users, nil
+	return user, nil
 }
 
 // USER COMMAND IMPL
@@ -78,7 +77,7 @@ func (u *userCommandImpl) Login(ctx context.Context, credentials model.User) (mo
 	db := u.db.GetConnection()
 
 	var existingUser model.User
-	err := db.WithContext(ctx).Table("users").Where("username = ?", credentials.Username).First(&existingUser).Error
+	err := db.WithContext(ctx).Table("users").Where("username = ?", credentials.Username).Where("deleted_at IS NULL").First(&existingUser).Error
 	if err != nil {
 		return model.User{}, err
 	}
@@ -89,7 +88,6 @@ func (u *userCommandImpl) Login(ctx context.Context, credentials model.User) (mo
 	if err := bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(credentials.Password)); err != nil {
 		return model.User{}, err
 	}
-
 	return existingUser, nil
 }
 
@@ -97,7 +95,7 @@ func (u *userCommandImpl) UpdateUserById(ctx context.Context, updatedUser model.
 	db := u.db.GetConnection()
 
 	var user model.User
-	if err := db.WithContext(ctx).Table("users").Where("id = ?", id).First(&user).Error; err != nil {
+	if err := db.WithContext(ctx).Table("users").Where("id = ?", id).Where("deleted_at IS NULL").First(&user).Error; err != nil {
 		return model.User{}, err
 	}
 
@@ -108,7 +106,6 @@ func (u *userCommandImpl) UpdateUserById(ctx context.Context, updatedUser model.
 	if err := db.WithContext(ctx).Save(&user).Error; err != nil {
 		return model.User{}, err
 	}
-
 	return user, nil
 }
 
@@ -124,7 +121,6 @@ func (u *userCommandImpl) DeleteUserById(ctx context.Context, id uint64) error {
 	if err := db.WithContext(ctx).Table("users").Where("id = ?", id).Update("deleted_at", time.Now()).Error; err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -132,9 +128,8 @@ func (u *userCommandImpl) DeleteUserById(ctx context.Context, id uint64) error {
 func (u *userCommandImpl) GenerateUserAccessToken(ctx context.Context, user model.User) (model.User, error) {
 	db := u.db.GetConnection()
 
-	if err := db.WithContext(ctx).Preload("users").Error; err != nil {
+	if err := db.WithContext(ctx).Preload("users").Where("deleted_at IS NULL").Error; err != nil {
 		return model.User{}, err
 	}
-
 	return user, nil
 }

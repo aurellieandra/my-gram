@@ -11,17 +11,26 @@ import (
 
 func main() {
 	g := gin.Default()
-
-	usersGroup := g.Group("/users")
-
 	gorm := infrastructure.NewGormPostgres()
+
+	v1 := g.Group("/api/v1")
+
+	usersGroup := v1.Group("/users")
 	userRepo := repository.NewUserQuery(gorm)
 	userCmd := repository.NewUserCommand(gorm)
 	userSvc := service.NewUserService(userRepo, userCmd)
 	userHdl := handler.NewUserHandler(userSvc)
 	userRouter := router.NewUserRouter(usersGroup, userHdl)
 
+	photosGroup := v1.Group("/photos")
+	photoRepo := repository.NewPhotoQuery(gorm)
+	photoCmd := repository.NewPhotoCommand(gorm)
+	photoSvc := service.NewPhotoService(photoRepo, photoCmd)
+	photoHdl := handler.NewPhotoHandler(photoSvc)
+	photoRouter := router.NewPhotoRouter(photosGroup, photoHdl)
+
 	userRouter.Mount()
+	photoRouter.Mount()
 
 	g.Run(":3000")
 }

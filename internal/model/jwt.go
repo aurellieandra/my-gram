@@ -12,6 +12,6 @@ type StandardClaim struct {
 
 type AccessClaim struct {
 	StandardClaim
-	UserId uint64       `json:"user_id" gorm:"column:user_id;foreignKey:UserID;references:users(ID)"`
-	Data   UserResponse `json:"data"`
+	User_Id uint64       `json:"user_id" gorm:"column:user_id;not null;foreignKey:UserID;references:users(ID)"`
+	Data    UserResponse `json:"data"`
 }

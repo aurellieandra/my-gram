@@ -81,17 +81,14 @@ func (u *userServiceImpl) GetUsers(ctx context.Context) ([]model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return users, err
 }
 
 func (u *userServiceImpl) GetUserById(ctx context.Context, id uint64) (*model.User, error) {
 	user, err := u.repo.GetUserById(ctx, id)
-
 	if err != nil {
 		return nil, err
 	}
-
 	return user, err
 }
 
@@ -145,7 +142,7 @@ func (u *userServiceImpl) GenerateUserAccessToken(ctx context.Context, user mode
 
 	userClaim := model.AccessClaim{
 		StandardClaim: claim,
-		UserId:        user.ID,
+		User_Id:       user.ID,
 		Data:          userResponse,
 	}
 
