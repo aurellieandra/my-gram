@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/aurellieandra/my-gram/internal/infrastructure"
@@ -42,7 +41,6 @@ func (u *photoQueryImpl) GetPhotos(ctx context.Context, user_id *uint64) ([]mode
 	photos := []model.Photo{}
 
 	query := db.WithContext(ctx).Table("photos").Where("deleted_at IS NULL")
-	fmt.Println(query)
 
 	if user_id != nil && *user_id != 0 {
 		query = query.Where("user_id = ?", *user_id)

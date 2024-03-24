@@ -29,8 +29,16 @@ func main() {
 	photoHdl := handler.NewPhotoHandler(photoSvc)
 	photoRouter := router.NewPhotoRouter(photosGroup, photoHdl)
 
+	socialMediasGroup := v1.Group("/social-medias")
+	socialMediaRepo := repository.NewSocialMediaQuery(gorm)
+	socialMediaCmd := repository.NewSocialMediaCommand(gorm)
+	socialMediaSvc := service.NewSocialMediaService(socialMediaRepo, socialMediaCmd)
+	socialMediaHdl := handler.NewSocialMediaHandler(socialMediaSvc)
+	socialMediaRouter := router.NewSocialMediaRouter(socialMediasGroup, socialMediaHdl)
+
 	userRouter.Mount()
 	photoRouter.Mount()
+	socialMediaRouter.Mount()
 
 	g.Run(":3000")
 }
