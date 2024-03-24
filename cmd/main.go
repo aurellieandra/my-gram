@@ -36,9 +36,17 @@ func main() {
 	socialMediaHdl := handler.NewSocialMediaHandler(socialMediaSvc)
 	socialMediaRouter := router.NewSocialMediaRouter(socialMediasGroup, socialMediaHdl)
 
+	commentsGroup := v1.Group("/comments")
+	commentRepo := repository.NewCommentQuery(gorm)
+	commentCmd := repository.NewCommentCommand(gorm)
+	commentSvc := service.NewCommentService(commentRepo, commentCmd)
+	commentHdl := handler.NewCommentHandler(commentSvc)
+	commentRouter := router.NewCommentRouter(commentsGroup, commentHdl)
+
 	userRouter.Mount()
 	photoRouter.Mount()
 	socialMediaRouter.Mount()
+	commentRouter.Mount()
 
 	g.Run(":3000")
 }

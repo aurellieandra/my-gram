@@ -10,7 +10,7 @@ type SocialMedia struct {
 	UpdatedAt time.Time  `json:"updated_at" gorm:"column:updated_at;autoUpdateTime;"`
 	DeletedAt *time.Time `json:"deleted_at" gorm:"column:deleted_at;"`
 
-	User_Id uint64 `json:"user_id" gorm:"column:user_id;not null;foreignKey:UserID;references:users(ID)"`
+	User_Id uint64 `json:"user_id" gorm:"column:user_id;not null;foreignKey:User_Id;references:users(ID)"`
 }
 
 func (SocialMedia) TableName() string {
