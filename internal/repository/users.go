@@ -83,7 +83,7 @@ func (u *userCommandImpl) Login(ctx context.Context, credentials model.User) (mo
 	db := u.db.GetConnection()
 
 	var existingUser model.User
-	err := db.WithContext(ctx).Table("users").Where("username = ?", credentials.Username).Where("deleted_at IS NULL").First(&existingUser).Error
+	err := db.WithContext(ctx).Table("users").Where("email = ?", credentials.Email).Where("deleted_at IS NULL").First(&existingUser).Error
 	if err != nil {
 		return model.User{}, err
 	}

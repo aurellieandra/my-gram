@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/aurellieandra/my-gram/internal/model"
 	"github.com/aurellieandra/my-gram/internal/service"
@@ -43,6 +44,21 @@ func (u *userHandlerImpl) Register(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, pkg.Response{
 			Status:  http.StatusBadRequest,
 			Message: "Bind payload failure",
+			Data:    nil,
+		})
+		return
+	}
+
+	now := time.Now()
+	dob := newUser.Dob
+	years := now.Year() - dob.Year()
+	if now.Month() < dob.Month() || (now.Month() == dob.Month() && now.Day() < dob.Day()) {
+		years--
+	}
+	if years < 8 {
+		ctx.JSON(http.StatusBadRequest, pkg.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Unable to register due to age requirements",
 			Data:    nil,
 		})
 		return
@@ -101,7 +117,7 @@ func (u *userHandlerImpl) Login(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, pkg.Response{
 			Status:  http.StatusBadRequest,
-			Message: "Invalid username or password",
+			Message: "Invalid email or password",
 			Data:    nil,
 		})
 		return
