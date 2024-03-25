@@ -86,7 +86,7 @@ func (u *socialMediaHandlerImpl) GetSocialMediaById(ctx *gin.Context) {
 			Data:    nil,
 		})
 		return
-	} else if social_media == nil {
+	} else if social_media == nil || social_media.ID == 0 {
 		ctx.JSON(http.StatusNotFound, pkg.Response{
 			Status:  http.StatusNotFound,
 			Message: "Data Not Found",

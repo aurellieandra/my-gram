@@ -86,7 +86,7 @@ func (u *commentHandlerImpl) GetCommentById(ctx *gin.Context) {
 			Data:    nil,
 		})
 		return
-	} else if comment == nil {
+	} else if comment == nil || comment.ID == 0 {
 		ctx.JSON(http.StatusNotFound, pkg.Response{
 			Status:  http.StatusNotFound,
 			Message: "Data Not Found",

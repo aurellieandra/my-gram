@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -47,8 +46,6 @@ func CheckAuthBearer(ctx *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(claims)
 
 	ctx.Set(CLAIM_USER_ID, claims["user_id"])
 	ctx.Set(CLAIM_USERNAME, claims["username"])

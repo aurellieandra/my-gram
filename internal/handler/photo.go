@@ -86,7 +86,7 @@ func (u *photoHandlerImpl) GetPhotoById(ctx *gin.Context) {
 			Data:    nil,
 		})
 		return
-	} else if photo == nil {
+	} else if photo == nil || photo.ID == 0 {
 		ctx.JSON(http.StatusNotFound, pkg.Response{
 			Status:  http.StatusNotFound,
 			Message: "Data Not Found",

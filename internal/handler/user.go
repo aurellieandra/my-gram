@@ -225,7 +225,7 @@ func (u *userHandlerImpl) GetUserById(ctx *gin.Context) {
 			Data:    nil,
 		})
 		return
-	} else if user == nil {
+	} else if user == nil || user.ID == 0 {
 		ctx.JSON(http.StatusNotFound, pkg.Response{
 			Status:  http.StatusNotFound,
 			Message: "Data Not Found",
